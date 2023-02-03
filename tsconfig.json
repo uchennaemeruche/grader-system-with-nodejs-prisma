@@ -5,8 +5,8 @@
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es2017",
-    "lib": ["ES2020"],
+    "target": "ES2018",
+    "lib": ["ESNext"],
     "sourceMap": true,
     "outDir": "./dist",
     "incremental": true,
@@ -19,5 +19,5 @@
     "strict": true
   },
   "include": ["src"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist", "tests"]
 }

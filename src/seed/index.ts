@@ -139,6 +139,46 @@ const resetDB = async () => {
             counter++
         }
 
+        // aggregate result
+        for (const assessment of course.assessments) {
+            const results = await prisma.assessmentResult.aggregate({
+                where: { assessmentId: assessment.id },
+                _avg: { result: true },
+                _max: { result: true },
+                _min: { result: true },
+                _count: true
+            })
+            console.log(
+                `Assessment Result: ${assessment.name} (id: ${assessment.id})`,
+                results
+            )
+        }
+
+        // aggregate uchenna's performance
+        const uchennaAggr = await prisma.assessmentResult.aggregate({
+            where: { student: { email: uchenna.email } },
+            _avg: { result: true },
+            _max: { result: true },
+            _min: { result: true },
+            _count: true
+        })
+        console.log(
+            `Uchenna's Performance: ${uchenna.name} (id: ${uchenna.id})`,
+            uchennaAggr
+        )
+        // aggregate emeruche's performance
+        const emerucheAggr = await prisma.assessmentResult.aggregate({
+            where: { student: { email: emeruche.email } },
+            _avg: { result: true },
+            _max: { result: true },
+            _min: { result: true },
+            _count: true
+        })
+        console.log(
+            `Emeruche's Performance: ${emeruche.name} (id: ${emeruche.id})`,
+            emerucheAggr
+        )
+
         prisma.$disconnect()
     } catch (error) {
         console.error(error)

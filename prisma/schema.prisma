@@ -16,17 +16,17 @@ model User {
   name   String
   social Json?
 
-  courses     CourseEnrollment[]
-  testResults TestResult[]       @relation(name: "results")
-  teacher     TestResult[]       @relation(name: "teacher")
+  courses           CourseEnrollment[]
+  assessmentResults AssessmentResult[] @relation(name: "results")
+  teacher           AssessmentResult[] @relation(name: "teacher")
 }
 
 model Course {
   id            Int                @id @default(autoincrement())
   title         String
   courseDetails String?
-  students      CourseEnrollment[]
-  tests         Test[]
+  members       CourseEnrollment[]
+  assessments   Assessment[]
 }
 
 model CourseEnrollment {
@@ -40,26 +40,26 @@ model CourseEnrollment {
   @@id([userId, courseId])
 }
 
-model Test {
-  id          Int          @id @default(autoincrement())
-  name        String
-  date        DateTime
-  updatedAt   DateTime     @updatedAt
-  courseId    Int
-  course      Course       @relation(fields: [courseId], references: [id])
-  testResults TestResult[]
+model Assessment {
+  id        Int                @id @default(autoincrement())
+  name      String
+  date      DateTime
+  updatedAt DateTime           @updatedAt
+  courseId  Int
+  course    Course             @relation(fields: [courseId], references: [id])
+  results   AssessmentResult[]
 }
 
-model TestResult {
-  id        Int      @id @default(autoincrement())
-  result    Int
-  createdAt DateTime @default(now())
-  testId    Int
-  test      Test     @relation(fields: [testId], references: [id])
-  graderId  Int
-  teacher   User     @relation(name: "teacher", fields: [graderId], references: [id])
-  studentId Int
-  student   User     @relation(name: "results", fields: [studentId], references: [id])
+model AssessmentResult {
+  id           Int        @id @default(autoincrement())
+  result       Int
+  createdAt    DateTime   @default(now())
+  assessmentId Int
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  graderId     Int
+  teacher      User       @relation(name: "teacher", fields: [graderId], references: [id])
+  studentId    Int
+  student      User       @relation(name: "results", fields: [studentId], references: [id])
 }
 
 enum UserRole {

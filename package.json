@@ -9,7 +9,7 @@
     "test": "jest --passWithNoTests",
     "prepare": "husky install",
     "dev": "ts-node-dev  --respawn  ./src/index.ts",
-    "seed": "ts-node ./src/seed/index.ts",
+    "seed": "ts-node ./src/seed/",
     "db:start": "docker-compose up -d",
     "prisma:generate": "prisma generate"
   },
@@ -36,7 +36,8 @@
   },
   "dependencies": {
     "@hapi/hapi": "^21.2.1",
-    "@prisma/client": "^4.9.0"
+    "@prisma/client": "^4.9.0",
+    "date-fns": "^2.29.3"
   },
   "husky": {
     "hooks": {

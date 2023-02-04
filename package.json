@@ -8,10 +8,11 @@
     "lint": "eslint . --ext .ts",
     "test": "jest --passWithNoTests",
     "prepare": "husky install",
-    "dev": "ts-node-dev  --respawn  ./src/index.ts",
+    "dev": "ts-node-dev  --respawn  ./src/server/index.ts",
     "seed": "ts-node ./src/seed/",
     "db:start": "docker-compose up -d",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "start:dev": ""
   },
   "keywords": [],
   "author": "",
@@ -37,7 +38,9 @@
   "dependencies": {
     "@hapi/hapi": "^21.2.1",
     "@prisma/client": "^4.9.0",
-    "date-fns": "^2.29.3"
+    "date-fns": "^2.29.3",
+    "dotenv": "^16.0.3",
+    "joi": "^17.7.0"
   },
   "husky": {
     "hooks": {

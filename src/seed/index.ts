@@ -2,13 +2,6 @@ import { PrismaClient } from '@prisma/client'
 import { add } from 'date-fns'
 
 const prisma = new PrismaClient()
-// const main = async () => {
-
-// }
-
-const weekFromNow = add(new Date(), { weeks: 1 })
-const twoWeeksFromNow = add(new Date(), { weeks: 2 })
-const monthFromNow = add(new Date(), { months: 1 })
 
 const resetDB = async () => {
     await prisma.assessmentResult.deleteMany({})
@@ -19,6 +12,9 @@ const resetDB = async () => {
 }
 
 ;(async () => {
+    const weekFromNow = add(new Date(), { weeks: 1 })
+    const twoWeeksFromNow = add(new Date(), { weeks: 2 })
+    const monthFromNow = add(new Date(), { months: 1 })
     try {
         await resetDB()
         const john = await prisma.user.create({

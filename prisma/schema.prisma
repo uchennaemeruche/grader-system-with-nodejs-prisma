@@ -11,14 +11,15 @@ datasource db {
 }
 
 model User {
-  id     Int    @id @default(autoincrement())
-  email  String @unique
-  name   String
+  id     Int     @id @default(autoincrement())
+  email  String  @unique
+  name   String?
   social Json?
 
   courses           CourseEnrollment[]
   assessmentResults AssessmentResult[] @relation(name: "results")
   teacher           AssessmentResult[] @relation(name: "teacher")
+  tokens            Token[]
 }
 
 model Course {
@@ -27,6 +28,18 @@ model Course {
   courseDetails String?
   members       CourseEnrollment[]
   assessments   Assessment[]
+}
+
+model Token {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  type       TokenType
+  emailToken String?
+  valid      Boolean   @default(true)
+  expiration DateTime
+  user       User      @relation(fields: [userId], references: [id])
+  userId     Int
 }
 
 model CourseEnrollment {
@@ -65,4 +78,9 @@ model AssessmentResult {
 enum UserRole {
   STUDENT
   TEACHER
+}
+
+enum TokenType {
+  EMAIL
+  API
 }

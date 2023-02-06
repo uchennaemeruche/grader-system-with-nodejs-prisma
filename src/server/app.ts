@@ -1,4 +1,5 @@
 import Hapi, { Server } from '@hapi/hapi'
+import { emailPlugin } from '../plugins/email'
 import { prismaPlugin } from '../plugins/prisma'
 import usersPlugin from '../users/users.route'
 
@@ -20,7 +21,7 @@ export class AppServer {
     }
 
     public async createServer() {
-        await this.server.register([prismaPlugin, usersPlugin])
+        await this.server.register([prismaPlugin, usersPlugin, emailPlugin])
         await this.server.initialize()
 
         return this.server

@@ -2,17 +2,29 @@ import { badImplementation } from '@hapi/boom'
 import { Request, ResponseToolkit } from '@hapi/hapi'
 import { add } from 'date-fns'
 
-const EMAIL_TOKEN_EXPIRATION_MINUTES = 10
 interface LoginInput {
     email: string
 }
+
+// interface AuthenticateInput {
+//     email: string
+//     emailToken: string
+// }
 export class AuthHandler {
+    constructor(
+        private EMAIL_TOKEN_EXPIRATION_MINUTES: number,
+        private TOKEN_EXPIRATION_HOURS: number,
+        private JWT_ALGORITHM: string,
+        private JWT_SECRET: string
+    ) {
+        console.log('HELLO THERE')
+    }
     async login(req: Request, res: ResponseToolkit) {
         const { prisma, sendEmail } = req.server.app
         const { email } = req.payload as LoginInput
         const emailToken = generateToken()
         const tokenExpiration = add(new Date(), {
-            minutes: EMAIL_TOKEN_EXPIRATION_MINUTES
+            minutes: this.EMAIL_TOKEN_EXPIRATION_MINUTES
         })
 
         try {
@@ -45,7 +57,7 @@ export class AuthHandler {
         }
     }
 
-    async signup(req: Request, res: ResponseToolkit) {
+    async authenticate(req: Request, res: ResponseToolkit) {
         const { prisma } = req.server.app
         try {
             const users = await prisma.user.findMany()

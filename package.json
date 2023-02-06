@@ -21,6 +21,8 @@
     "@commitlint/cli": "^17.4.2",
     "@commitlint/config-conventional": "^17.4.2",
     "@types/jest": "^29.4.0",
+    "@types/jsonwebtoken": "^9.0.1",
+    "@types/nodemailer": "^6.4.7",
     "@typescript-eslint/eslint-plugin": "^5.50.0",
     "@typescript-eslint/parser": "^5.50.0",
     "eslint": "^8.33.0",
@@ -44,7 +46,8 @@
     "hapi-auth-jwt2": "^10.4.0",
     "joi": "^17.7.0",
     "jsonwebtoken": "^9.0.0",
-    "mailtrap": "^3.0.1"
+    "mailtrap": "^3.0.1",
+    "nodemailer": "^6.9.1"
   },
   "husky": {
     "hooks": {

@@ -1,4 +1,6 @@
 import Hapi, { Server } from '@hapi/hapi'
+import hapiAuthJwt from 'hapi-auth-jwt2'
+import { authPlugin } from '../auth/auth.route'
 import { emailPlugin } from '../plugins/email'
 import { prismaPlugin } from '../plugins/prisma'
 import usersPlugin from '../users/users.route'
@@ -21,7 +23,13 @@ export class AppServer {
     }
 
     public async createServer() {
-        await this.server.register([prismaPlugin, usersPlugin, emailPlugin])
+        await this.server.register([
+            prismaPlugin,
+            usersPlugin,
+            emailPlugin,
+            hapiAuthJwt,
+            authPlugin
+        ])
         await this.server.initialize()
 
         return this.server

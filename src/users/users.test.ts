@@ -60,7 +60,7 @@ describe('Users Test', () => {
             expect(response.statusCode).toEqual(200)
             expect(Array.isArray(['response.result'])).toBe(true)
             expect(result.length).toBeGreaterThanOrEqual(1)
-            expect(result[0]).toMatchObject({
+            expect(result[0]).toMatchSnapshot({
                 id: expect.any(Number),
                 email: expect.any(String),
                 name: expect.any(String),

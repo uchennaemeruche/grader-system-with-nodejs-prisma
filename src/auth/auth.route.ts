@@ -1,16 +1,37 @@
 import { Plugin, Request, ResponseToolkit, Server } from '@hapi/hapi'
 import Joi from 'joi'
+import { CourseService } from '../course/course.service'
 import { AuthHandler } from './auth.handler'
 import { TokenService } from './token.service'
 
 const secret = process.env.JWT_SECRET || 'SUPER_SECRET_JWT_SECRET'
+const JWT_ALGORITHM = 'HS256'
+
+export const API_AUTH_STATEGY = 'API'
 
 export const authPlugin: Plugin<null> = {
     name: 'app/auth',
     dependencies: ['prisma', 'hapi-auth-jwt2', 'app/email'],
     register: async function (server: Server) {
-        const service: TokenService = new TokenService(server.app.prisma)
-        const handler = new AuthHandler(service, 10, 12, 'HS256', secret)
+        const tokenService: TokenService = new TokenService(server.app.prisma)
+        const courseService = new CourseService(server.app.prisma)
+        const handler = new AuthHandler(
+            tokenService,
+            courseService,
+            10,
+            12,
+            JWT_ALGORITHM,
+            secret
+        )
+
+        server.auth.strategy(API_AUTH_STATEGY, 'jwt', {
+            key: secret,
+            verifyOptions: { algorithms: [JWT_ALGORITHM] },
+            validate: handler.validateApiToken
+        })
+
+        // server.auth.default(API_AUTH_STATEGY)
+
         server.route({
             method: 'POST',
             path: '/auth/login',

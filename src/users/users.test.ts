@@ -60,11 +60,12 @@ describe('Users Test', () => {
             expect(response.statusCode).toEqual(200)
             expect(Array.isArray(['response.result'])).toBe(true)
             expect(result.length).toBeGreaterThanOrEqual(1)
-            expect(result[0]).toMatchSnapshot({
+            expect(result[0]).toMatchObject({
                 id: expect.any(Number),
                 email: expect.any(String),
                 name: expect.any(String),
-                social: expect.any(Object)
+                social: expect.any(Object),
+                isAdmin: expect.any(Boolean)
             })
         })
         it('Returns a single user given a user ID', async () => {
@@ -74,11 +75,13 @@ describe('Users Test', () => {
             })
 
             expect(response.statusCode).toEqual(200)
+            console.log(response.result)
             expect(response.result).toMatchSnapshot({
                 id: expect.any(Number),
                 email: expect.any(String),
                 name: expect.any(String),
-                social: expect.any(Object)
+                social: expect.any(Object),
+                isAdmin: expect.any(Boolean)
             })
         })
         it('Returns 404 for a wrong or non-existing user', async () => {

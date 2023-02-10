@@ -32,11 +32,9 @@ export class TokenService {
             return { success: false, error }
         }
     }
-    findToken = async (token: string) => {
+    findToken = async (filter: object) => {
         const emailToken = await this.prisma.token.findUnique({
-            where: {
-                emailToken: token
-            },
+            where: filter,
             include: {
                 user: true
             }

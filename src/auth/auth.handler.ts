@@ -1,9 +1,11 @@
 import { badImplementation, unauthorized, badRequest } from '@hapi/boom'
 import { Request, ResponseToolkit } from '@hapi/hapi'
-import { TokenType } from '@prisma/client'
+import { TokenType, UserRole } from '@prisma/client'
 import { add } from 'date-fns'
 import { TokenService } from './token.service'
 import { sign, Algorithm } from 'jsonwebtoken'
+import Joi from 'joi'
+import { CourseService } from '../course/course.service'
 
 interface LoginInput {
     email: string
@@ -14,9 +16,18 @@ interface AuthenticateInput {
     emailToken: string
 }
 
+interface APITokenPayload {
+    tokenId: number
+}
+
+const apiTokenSchema = Joi.object({
+    tokenId: Joi.number().integer().required()
+})
+
 export class AuthHandler {
     constructor(
-        private service: TokenService,
+        private tokenService: TokenService,
+        private courseService: CourseService,
         private tokenExpiration: number,
         private TOKEN_EXPIRATION_HOURS: number,
         private JWT_ALGORITHM: Algorithm,
@@ -31,7 +42,7 @@ export class AuthHandler {
         })
 
         try {
-            const token = await this.service.createToken(
+            const token = await this.tokenService.createToken(
                 email,
                 tokenExpiresAt,
                 TokenType.EMAIL,
@@ -57,7 +68,7 @@ export class AuthHandler {
     async authenticateToken(req: Request, res: ResponseToolkit) {
         const { email, emailToken } = req.payload as AuthenticateInput
         try {
-            const result = await this.service.findToken(emailToken)
+            const result = await this.tokenService.findToken({ emailToken })
             if (!result.success || !result.emailToken?.valid) {
                 return unauthorized()
             }
@@ -75,7 +86,7 @@ export class AuthHandler {
                 minutes: this.TOKEN_EXPIRATION_HOURS
             })
 
-            const token = await this.service.createToken(
+            const token = await this.tokenService.createToken(
                 email,
                 tokenExpiration,
                 TokenType.API
@@ -84,7 +95,7 @@ export class AuthHandler {
                 return badRequest()
             }
 
-            await this.service.updateToken(result.emailToken.id, {
+            await this.tokenService.updateToken(result.emailToken.id, {
                 valid: false
             })
 
@@ -93,6 +104,61 @@ export class AuthHandler {
         } catch (error: any) {
             console.log(error)
             return badImplementation(error.message)
+        }
+    }
+
+    validateApiToken = async (
+        decoded: APITokenPayload,
+        req: Request,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        res: ResponseToolkit
+    ) => {
+        const { tokenId } = decoded
+        const { error } = apiTokenSchema.validate(decoded)
+
+        if (error) {
+            req.log(['error', 'auth'], `API token error: ${error.message}`)
+            return { isValid: false }
+        }
+
+        try {
+            const token = await this.tokenService.findToken({ id: tokenId })
+            if (
+                !token.success ||
+                !token.emailToken ||
+                !token.emailToken.valid
+            ) {
+                return { isValid: false, error: 'Invalid Token' }
+            }
+
+            if (token.emailToken.expiration < new Date()) {
+                return { isValid: false, error: 'Token expired' }
+            }
+
+            const teacherOf = await this.courseService.findCourseEnrollment({
+                userId: token.emailToken.userId,
+                role: UserRole.TEACHER
+            })
+            if (!teacherOf.success || !teacherOf.courseTeacher) {
+                return { isValid: false }
+            }
+
+            // At this point, the token is valid. Make `userId`, `isAdmin` and `teacherOf` to `credentials` which is available in route handlers via `request.auth.credentials`
+            return {
+                isValid: true,
+                credentials: {
+                    tokenId: decoded.tokenId,
+                    userId: token.emailToken.userId,
+                    idAdmin: token.emailToken.user.isAdmin,
+                    // convert teacherOf from an array of objects to an array of numbers
+                    teacherOf: teacherOf.courseTeacher.map(
+                        ({ courseId }) => courseId
+                    )
+                }
+            }
+        } catch (error: any) {
+            req.log(['error', 'auth', 'db'], error)
+            return { isValid: false }
         }
     }
 

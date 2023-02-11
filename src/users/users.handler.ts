@@ -1,4 +1,4 @@
-import { badImplementation } from '@hapi/boom'
+import { badImplementation, forbidden } from '@hapi/boom'
 import { Request, ResponseToolkit } from '@hapi/hapi'
 
 interface UserInput {
@@ -88,5 +88,20 @@ export class UserHandler {
             if (error.code === 'P2025') return res.response().code(404)
             return res.response().code(500)
         }
+    }
+
+    // Pre-function to check if authenticated user matches the requested user
+    async isRequestedUserOrAdmin(req: Request, res: ResponseToolkit) {
+        // userId and isAdmin are populated by `validateApiToken` function
+        const { userId, isAdmin } = req.auth.credentials
+
+        if (isAdmin) return res.continue
+
+        const requestedUserId = parseInt(req.params.userId, 10)
+
+        // check if requested user matches authenticatedUser
+        if (requestedUserId === userId) return res.continue
+
+        throw forbidden()
     }
 }

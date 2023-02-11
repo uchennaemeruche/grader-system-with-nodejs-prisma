@@ -25,6 +25,7 @@ model User {
 
 model Course {
   id            Int                @id @default(autoincrement())
+  code          String             @unique
   title         String
   courseDetails String?
   members       CourseEnrollment[]

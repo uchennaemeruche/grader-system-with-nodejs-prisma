@@ -149,7 +149,7 @@ export class AuthHandler {
                 credentials: {
                     tokenId: decoded.tokenId,
                     userId: token.emailToken.userId,
-                    idAdmin: token.emailToken.user.isAdmin,
+                    isAdmin: token.emailToken.user.isAdmin,
                     // convert teacherOf from an array of objects to an array of numbers
                     teacherOf: teacherOf.courseTeacher.map(
                         ({ courseId }) => courseId

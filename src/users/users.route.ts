@@ -1,5 +1,6 @@
 import { Plugin, Server } from '@hapi/hapi'
 import Joi from 'joi'
+import { API_AUTH_STATEGY } from '../auth/auth.route'
 import { UserHandler } from './users.handler'
 
 const userInputValidator = Joi.object({
@@ -46,6 +47,11 @@ const usersPlugin: Plugin<null> = {
                 path: '/users/{userId}',
                 handler: handler.getUser,
                 options: {
+                    pre: [handler.isRequestedUserOrAdmin],
+                    auth: {
+                        mode: 'required',
+                        strategy: API_AUTH_STATEGY
+                    },
                     validate: {
                         params: Joi.object({
                             userId: Joi.number().integer().required()
@@ -58,6 +64,11 @@ const usersPlugin: Plugin<null> = {
                 path: '/users/{userId}',
                 handler: handler.deleteUser,
                 options: {
+                    pre: [handler.isRequestedUserOrAdmin],
+                    auth: {
+                        mode: 'required',
+                        strategy: API_AUTH_STATEGY
+                    },
                     validate: {
                         params: Joi.object({
                             userId: Joi.number().integer().required()
@@ -70,6 +81,11 @@ const usersPlugin: Plugin<null> = {
                 path: '/users/{userId}',
                 handler: handler.updateUser,
                 options: {
+                    pre: [handler.isRequestedUserOrAdmin],
+                    auth: {
+                        mode: 'required',
+                        strategy: API_AUTH_STATEGY
+                    },
                     validate: {
                         params: Joi.object({
                             userId: Joi.number().integer().required()

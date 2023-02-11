@@ -91,21 +91,20 @@ describe('Users Test', () => {
                 isAdmin: expect.any(Boolean)
             })
         })
-        it('Returns a single user given a user ID', async () => {
+        it('Returns a single user when the requesting Non-Admin User ID equals the requested user ID', async () => {
+            const credentials = await createUserCredentials(
+                server.app.prisma,
+                false
+            )
             const response = await server.inject({
                 method: 'GET',
-                url: `/users/${userId}`,
+                url: `/users/${credentials.userId}`,
                 auth: {
                     strategy: API_AUTH_STATEGY,
-                    credentials: await createUserCredentials(
-                        server.app.prisma,
-                        false
-                    )
+                    credentials
                 }
             })
-
             expect(response.statusCode).toEqual(200)
-            console.log(response.result)
             expect(response.result).toMatchSnapshot({
                 id: expect.any(Number),
                 email: expect.any(String),
@@ -113,6 +112,45 @@ describe('Users Test', () => {
                 social: expect.any(Object),
                 isAdmin: expect.any(Boolean)
             })
+        })
+        it('Returns a single user when the requesting User isAdmin', async () => {
+            const credentials = await createUserCredentials(
+                server.app.prisma,
+                true
+            )
+            const response = await server.inject({
+                method: 'GET',
+                url: `/users/${userId}`,
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials
+                }
+            })
+            expect(response.statusCode).toEqual(200)
+            expect(response.result).toMatchSnapshot({
+                id: expect.any(Number),
+                email: expect.any(String),
+                name: expect.any(String),
+                social: expect.any(Object),
+                isAdmin: expect.any(Boolean)
+            })
+        })
+        it('Returns a 403 Error when the requesting user is not equals to user ID', async () => {
+            const credentials = await createUserCredentials(
+                server.app.prisma,
+                false
+            )
+            const response = await server.inject({
+                method: 'GET',
+                url: `/users/${userId}`,
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials
+                }
+            })
+
+            expect(response.statusCode).toEqual(403)
+            expect(response.result).toHaveProperty('error')
         })
         it('Returns 404 for a wrong or non-existing user', async () => {
             const response = await server.inject({
@@ -122,7 +160,7 @@ describe('Users Test', () => {
                     strategy: API_AUTH_STATEGY,
                     credentials: await createUserCredentials(
                         server.app.prisma,
-                        false
+                        true
                     )
                 }
             })
@@ -137,7 +175,7 @@ describe('Users Test', () => {
                     strategy: API_AUTH_STATEGY,
                     credentials: await createUserCredentials(
                         server.app.prisma,
-                        false
+                        true
                     )
                 }
             })
@@ -154,7 +192,7 @@ describe('Users Test', () => {
                     strategy: API_AUTH_STATEGY,
                     credentials: await createUserCredentials(
                         server.app.prisma,
-                        false
+                        true
                     )
                 }
             })
@@ -168,13 +206,34 @@ describe('Users Test', () => {
                     strategy: API_AUTH_STATEGY,
                     credentials: await createUserCredentials(
                         server.app.prisma,
-                        false
+                        true
                     )
                 }
             })
             expect(response.statusCode).toEqual(400)
         })
-        it('updates a user given an ID', async () => {
+        it('updates a user when requesting User Id equals ID of user to be updated', async () => {
+            const updatedName = 'Uchechukwu Emeruche'
+            const credentials = await createUserCredentials(
+                server.app.prisma,
+                false
+            )
+            const response = await server.inject({
+                method: 'PUT',
+                url: `/users/${credentials.userId}`,
+                payload: {
+                    name: updatedName
+                },
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials
+                }
+            })
+            expect(response.statusCode).toEqual(200)
+            const user = JSON.parse(response.payload)
+            expect(user.name).toEqual(updatedName)
+        })
+        it('updates a user when requesting User equals admin', async () => {
             const updatedName = 'Uchechukwu Emeruche'
             const response = await server.inject({
                 method: 'PUT',
@@ -186,7 +245,7 @@ describe('Users Test', () => {
                     strategy: API_AUTH_STATEGY,
                     credentials: await createUserCredentials(
                         server.app.prisma,
-                        false
+                        true
                     )
                 }
             })
@@ -205,13 +264,28 @@ describe('Users Test', () => {
                     strategy: API_AUTH_STATEGY,
                     credentials: await createUserCredentials(
                         server.app.prisma,
-                        false
+                        true
                     )
                 }
             })
             expect(response.statusCode).toEqual(400)
         })
-        it('Deletes a user with the given ID', async () => {
+        it('Deletes a user when requesting User Id equals ID of user to be deleted', async () => {
+            const credentials = await createUserCredentials(
+                server.app.prisma,
+                false
+            )
+            const response = await server.inject({
+                method: 'DELETE',
+                url: `/users/${credentials.userId}`,
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials: credentials
+                }
+            })
+            expect(response.statusCode).toEqual(204)
+        })
+        it('Deletes a user when requesting User is admin', async () => {
             const response = await server.inject({
                 method: 'DELETE',
                 url: `/users/${userId}`,
@@ -219,7 +293,7 @@ describe('Users Test', () => {
                     strategy: API_AUTH_STATEGY,
                     credentials: await createUserCredentials(
                         server.app.prisma,
-                        false
+                        true
                     )
                 }
             })

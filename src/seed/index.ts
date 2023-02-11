@@ -7,6 +7,7 @@ const resetDB = async () => {
     await prisma.assessmentResult.deleteMany({})
     await prisma.courseEnrollment.deleteMany({})
     await prisma.assessment.deleteMany({})
+    await prisma.token.deleteMany({})
     await prisma.user.deleteMany({})
     await prisma.course.deleteMany({})
 }
@@ -27,6 +28,18 @@ const resetDB = async () => {
                 }
             }
         })
+        const admin = await prisma.user.create({
+            data: {
+                email: 'admin@example.com',
+                name: 'Adam Doe',
+                social: {
+                    facebook: '@adam_doe',
+                    twitter: '@adamdoe'
+                },
+                isAdmin: true
+            }
+        })
+        console.log('ADMIN', admin)
 
         const course = await prisma.course.create({
             data: {

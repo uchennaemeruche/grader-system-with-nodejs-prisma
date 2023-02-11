@@ -1,7 +1,84 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, UserRole } from '@prisma/client'
 
+export interface CourseInput {
+    title: string
+    details: string
+    member: {
+        role: UserRole
+        email: string
+    }
+}
 export class CourseService {
     constructor(private prisma: PrismaClient) {}
+
+    createCourse = async (data: CourseInput) => {
+        const course = await this.prisma.course.create({
+            data: {
+                title: data.title,
+                courseDetails: data.details,
+                members: {
+                    create: {
+                        role: data.member.role,
+                        user: {
+                            connect: {
+                                email: data.member.email
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        if (!course)
+            return { success: false, error: 'Could not create new course' }
+        return { success: true, data: course }
+    }
+    updateCourse = async (courseId: number, data: CourseInput) => {
+        const course = await this.prisma.course.update({
+            data: {
+                title: data.title,
+                courseDetails: data.details,
+                members: {
+                    create: {
+                        role: data.member.role,
+                        user: {
+                            connect: {
+                                email: data.member.email
+                            }
+                        }
+                    }
+                }
+            },
+            where: {
+                id: courseId
+            }
+        })
+        if (!course)
+            return { success: false, error: 'Could not create new course' }
+        return { success: true, data: course }
+    }
+
+    findCourse = async (courseId: number) => {
+        const course = await this.prisma.course.findUnique({
+            where: {
+                id: courseId
+            }
+        })
+        if (!course)
+            return { success: false, error: 'Could not create new course' }
+        return { success: true, data: course }
+    }
+
+    findCourses = async (isAdmin: boolean, userId: number) => {
+        const courses = await this.prisma.courseEnrollment.findMany({
+            where: isAdmin ? {} : { userId },
+            include: {
+                course: true
+            }
+        })
+        if (!courses)
+            return { success: false, error: 'Could not create new course' }
+        return { success: true, data: courses }
+    }
 
     findCourseEnrollment = async (filter: object) => {
         const courseTeacher = await this.prisma.courseEnrollment.findMany({

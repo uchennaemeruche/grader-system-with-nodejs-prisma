@@ -1,5 +1,7 @@
 import { Server } from '@hapi/hapi'
+import { API_AUTH_STATEGY } from '../auth/auth.route'
 import { AppServer } from '../server/app'
+import { createUserCredentials } from '../test/test.helper'
 
 describe('Users Test', () => {
     let server: Server
@@ -22,6 +24,13 @@ describe('Users Test', () => {
                     social: {
                         twitter: 'giveittojest'
                     }
+                },
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials: await createUserCredentials(
+                        server.app.prisma,
+                        false
+                    )
                 }
             })
             userId = JSON.parse(response.payload)?.id
@@ -40,6 +49,13 @@ describe('Users Test', () => {
                     social: {
                         twitter: 'giveittojest'
                     }
+                },
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials: await createUserCredentials(
+                        server.app.prisma,
+                        false
+                    )
                 }
             })
             expect(response.statusCode).toEqual(400)
@@ -52,7 +68,14 @@ describe('Users Test', () => {
         it('Returns a list of created users', async () => {
             const response = await server.inject({
                 method: 'GET',
-                url: '/users'
+                url: '/users',
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials: await createUserCredentials(
+                        server.app.prisma,
+                        false
+                    )
+                }
             })
 
             const result = response.result as Array<object>
@@ -71,7 +94,14 @@ describe('Users Test', () => {
         it('Returns a single user given a user ID', async () => {
             const response = await server.inject({
                 method: 'GET',
-                url: `/users/${userId}`
+                url: `/users/${userId}`,
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials: await createUserCredentials(
+                        server.app.prisma,
+                        false
+                    )
+                }
             })
 
             expect(response.statusCode).toEqual(200)
@@ -87,7 +117,14 @@ describe('Users Test', () => {
         it('Returns 404 for a wrong or non-existing user', async () => {
             const response = await server.inject({
                 method: 'GET',
-                url: '/users/1000'
+                url: '/users/1000',
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials: await createUserCredentials(
+                        server.app.prisma,
+                        false
+                    )
+                }
             })
 
             expect(response.statusCode).toEqual(404)
@@ -95,7 +132,14 @@ describe('Users Test', () => {
         it('Returns a 400 validation error for an invalid param', async () => {
             const response = await server.inject({
                 method: 'GET',
-                url: '/users/aaksllss'
+                url: '/users/aaksllss',
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials: await createUserCredentials(
+                        server.app.prisma,
+                        false
+                    )
+                }
             })
             expect(response.statusCode).toEqual(400)
             expect(response.result).toHaveProperty('error')
@@ -105,14 +149,28 @@ describe('Users Test', () => {
         it('fails and returns 400 error given an invalid userId parameter', async () => {
             const response = await server.inject({
                 method: 'PUT',
-                url: `/users/jfjjkdkd`
+                url: `/users/jfjjkdkd`,
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials: await createUserCredentials(
+                        server.app.prisma,
+                        false
+                    )
+                }
             })
             expect(response.statusCode).toEqual(400)
         })
         it('returns 404 for non-existing userId', async () => {
             const response = await server.inject({
                 method: 'PUT',
-                url: `/users/1`
+                url: `/users/1`,
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials: await createUserCredentials(
+                        server.app.prisma,
+                        false
+                    )
+                }
             })
             expect(response.statusCode).toEqual(400)
         })
@@ -123,6 +181,13 @@ describe('Users Test', () => {
                 url: `/users/${userId}`,
                 payload: {
                     name: updatedName
+                },
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials: await createUserCredentials(
+                        server.app.prisma,
+                        false
+                    )
                 }
             })
             expect(response.statusCode).toEqual(200)
@@ -135,14 +200,28 @@ describe('Users Test', () => {
         it('fails and returns 400 error with invalid userId parameter ', async () => {
             const response = await server.inject({
                 method: 'DELETE',
-                url: '/users/jsj002'
+                url: '/users/jsj002',
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials: await createUserCredentials(
+                        server.app.prisma,
+                        false
+                    )
+                }
             })
             expect(response.statusCode).toEqual(400)
         })
         it('Deletes a user with the given ID', async () => {
             const response = await server.inject({
                 method: 'DELETE',
-                url: `/users/${userId}`
+                url: `/users/${userId}`,
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials: await createUserCredentials(
+                        server.app.prisma,
+                        false
+                    )
+                }
             })
             expect(response.statusCode).toEqual(204)
         })

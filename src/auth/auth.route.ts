@@ -9,7 +9,15 @@ const JWT_ALGORITHM = 'HS256'
 
 export const API_AUTH_STATEGY = 'API'
 
-export const authPlugin: Plugin<null> = {
+declare module '@hapi/hapi' {
+    interface AuthCredentials {
+        userId: number
+        tokenId: number
+        isAdmin: boolean
+        teacherOf: number[]
+    }
+}
+const authPlugin: Plugin<null> = {
     name: 'app/auth',
     dependencies: ['prisma', 'hapi-auth-jwt2', 'app/email'],
     register: async function (server: Server) {
@@ -30,7 +38,8 @@ export const authPlugin: Plugin<null> = {
             validate: handler.validateApiToken
         })
 
-        // server.auth.default(API_AUTH_STATEGY)
+        // Set the default API strategy for API routes, unless explicity disabled.
+        server.auth.default(API_AUTH_STATEGY)
 
         server.route({
             method: 'POST',
@@ -63,3 +72,4 @@ export const authPlugin: Plugin<null> = {
         })
     }
 }
+export default authPlugin

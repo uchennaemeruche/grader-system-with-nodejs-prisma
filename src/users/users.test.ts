@@ -7,6 +7,19 @@ describe('Users Test', () => {
     let server: Server
     beforeAll(async () => {
         server = await new AppServer(3000, 'localhost').createServer()
+
+        server.decorate('request', 'inject', async function (url: string) {
+            return this.server.inject({
+                url,
+                auth: {
+                    strategy: API_AUTH_STATEGY,
+                    credentials: await createUserCredentials(
+                        server.app.prisma,
+                        false
+                    )
+                }
+            })
+        })
     })
 
     afterAll(async () => {

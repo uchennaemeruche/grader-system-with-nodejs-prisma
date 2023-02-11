@@ -69,6 +69,20 @@ const coursePlugin: Plugin<null> = {
                         })
                     }
                 }
+            },
+            {
+                method: 'PUT',
+                path: '/courses/{courseId}',
+                handler: (req: Request, res: ResponseToolkit) =>
+                    handler.update(req, res),
+                options: {
+                    validate: {
+                        params: Joi.object().keys({
+                            courseId: Joi.number().required()
+                        }),
+                        payload: CourseInputValidator.tailor('update')
+                    }
+                }
             }
         ])
     }

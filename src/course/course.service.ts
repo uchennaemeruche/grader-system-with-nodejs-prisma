@@ -16,16 +16,19 @@ export class CourseService {
             data: {
                 title: data.title,
                 courseDetails: data.details,
-                members: {
-                    create: {
-                        role: data.member.role,
-                        user: {
-                            connect: {
-                                email: data.member.email
-                            }
-                        }
-                    }
-                }
+
+                members: !data.member
+                    ? {}
+                    : {
+                          create: {
+                              role: data?.member?.role,
+                              user: {
+                                  connect: {
+                                      email: data?.member?.email
+                                  }
+                              }
+                          }
+                      }
             }
         })
         if (!course)
@@ -69,10 +72,19 @@ export class CourseService {
     }
 
     findCourses = async (isAdmin: boolean, userId: number) => {
-        const courses = await this.prisma.courseEnrollment.findMany({
-            where: isAdmin ? {} : { userId },
-            include: {
-                course: true
+        const courses = await this.prisma.course.findMany({
+            // include: {},
+            select: {
+                id: true,
+                title: true,
+                courseDetails: true,
+                members: {
+                    where: isAdmin ? {} : { userId },
+                    select: {
+                        role: true,
+                        userId: true
+                    }
+                }
             }
         })
         if (!courses)

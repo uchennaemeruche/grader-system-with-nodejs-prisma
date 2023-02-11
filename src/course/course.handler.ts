@@ -15,6 +15,21 @@ export class CourseHandler {
             return res.response(error.message).code(400)
         }
     }
+    async update(req: Request, res: ResponseToolkit) {
+        const { courseId } = req.params
+        const payload = req.payload as CourseInput
+        try {
+            const result = await this.courseService.updateCourse(
+                courseId,
+                payload
+            )
+            if (!result.success || !result.data) return res.response().code(400)
+
+            return res.response(result.data).code(201)
+        } catch (error: any) {
+            return res.response(error.message).code(400)
+        }
+    }
 
     async getAll(req: Request, res: ResponseToolkit) {
         const { userId, isAdmin } = req.auth.credentials

@@ -5,13 +5,27 @@ export interface CourseInput {
     details: string
     member: {
         role: UserRole
-        email: string
+        email?: string
+        id?: number
     }
+}
+
+export type CourseResponseObject = {
+    id: number
+    title: string
+    courseDetails: string | null
+    members?: { role: string; userId: number }[]
+}
+
+interface CourseResponse {
+    success: boolean
+    data?: CourseResponseObject | CourseResponseObject[]
+    error?: string
 }
 export class CourseService {
     constructor(private prisma: PrismaClient) {}
 
-    createCourse = async (data: CourseInput) => {
+    createCourse = async (data: CourseInput): Promise<CourseResponse> => {
         const course = await this.prisma.course.create({
             data: {
                 title: data.title,
@@ -24,7 +38,9 @@ export class CourseService {
                               role: data?.member?.role,
                               user: {
                                   connect: {
-                                      email: data?.member?.email
+                                      id: data.member.id ?? data.member.id,
+                                      email:
+                                          data.member.email ?? data.member.email
                                   }
                               }
                           }
@@ -35,7 +51,10 @@ export class CourseService {
             return { success: false, error: 'Could not create new course' }
         return { success: true, data: course }
     }
-    updateCourse = async (courseId: number, data: CourseInput) => {
+    updateCourse = async (
+        courseId: number,
+        data: CourseInput
+    ): Promise<CourseResponse> => {
         const course = await this.prisma.course.update({
             data: {
                 title: data.title,
@@ -45,7 +64,8 @@ export class CourseService {
                         role: data.member.role,
                         user: {
                             connect: {
-                                email: data.member.email
+                                id: data.member.id ?? data.member.id,
+                                email: data.member.email ?? data.member.email
                             }
                         }
                     }
@@ -60,7 +80,7 @@ export class CourseService {
         return { success: true, data: course }
     }
 
-    findCourse = async (courseId: number) => {
+    findCourse = async (courseId: number): Promise<CourseResponse> => {
         const course = await this.prisma.course.findUnique({
             where: {
                 id: courseId
@@ -71,9 +91,20 @@ export class CourseService {
         return { success: true, data: course }
     }
 
-    findCourses = async (isAdmin: boolean, userId: number) => {
+    findCourses = async (
+        isAdmin: boolean,
+        userId: number
+    ): Promise<CourseResponse> => {
         const courses = await this.prisma.course.findMany({
-            // include: {},
+            where: isAdmin
+                ? {}
+                : {
+                      members: {
+                          some: {
+                              userId
+                          }
+                      }
+                  },
             select: {
                 id: true,
                 title: true,

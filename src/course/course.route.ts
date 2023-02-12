@@ -25,7 +25,11 @@ const CourseInputValidator = Joi.object({
             .alter({
                 create: (schema) => schema.optional(),
                 update: (schema) => schema.optional()
-            })
+            }),
+        id: Joi.number().alter({
+            create: (schema) => schema.optional(),
+            update: (schema) => schema.optional()
+        })
     })
 })
 const coursePlugin: Plugin<null> = {

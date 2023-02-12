@@ -83,7 +83,7 @@ export class AuthHandler {
                 return unauthorized()
             }
             const tokenExpiration = add(new Date(), {
-                minutes: this.TOKEN_EXPIRATION_HOURS
+                hours: this.TOKEN_EXPIRATION_HOURS
             })
 
             const token = await this.tokenService.createToken(

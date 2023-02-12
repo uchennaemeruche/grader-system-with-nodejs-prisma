@@ -9,7 +9,10 @@ export const createUserCredentials = async (
     const testUser = await prisma.user.create({
         data: {
             name: 'test--name',
-            email: `test-${Date.now()}@test.io`,
+            email: `test-${
+                Date.now() +
+                Math.floor(10000000 + Math.random() * 90000000).toString()
+            }@test.io`,
             isAdmin,
             tokens: {
                 create: {

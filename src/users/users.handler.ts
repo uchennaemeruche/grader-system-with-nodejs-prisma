@@ -85,6 +85,7 @@ export class UserHandler {
             })
             return res.response(updatedUser).code(200)
         } catch (error: any) {
+            console.log('ERROR:', error)
             if (error.code === 'P2025') return res.response().code(404)
             return res.response().code(500)
         }

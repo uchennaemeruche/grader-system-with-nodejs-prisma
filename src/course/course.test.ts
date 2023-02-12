@@ -21,6 +21,7 @@ describe('Course Test', () => {
     })
 
     afterAll(async () => {
+        await resetDB()
         await server.stop()
     })
     let defaultCredentials: AuthCredentials<UserCredentials, AppCredentials>

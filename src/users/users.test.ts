@@ -12,6 +12,7 @@ describe('Users Test', () => {
     })
 
     afterAll(async () => {
+        // await resetDB()
         await server.stop()
     })
     let userId: number
@@ -128,8 +129,6 @@ describe('Users Test', () => {
                     credentials
                 }
             })
-            console.log(' user ID', userId)
-            console.log('single user', response.result)
             expect(response.statusCode).toEqual(200)
             expect(response.result).toMatchSnapshot({
                 id: expect.any(Number),
@@ -239,9 +238,14 @@ describe('Users Test', () => {
         })
         it('updates a user when requesting User equals admin', async () => {
             const updatedName = 'Uchechukwu Emeruche'
+
+            const userToUpdate = await createUserCredentials(
+                server.app.prisma,
+                false
+            )
             const response = await server.inject({
                 method: 'PUT',
-                url: `/users/${userId}`,
+                url: `/users/${userToUpdate.userId}`,
                 payload: {
                     name: updatedName
                 },
@@ -253,6 +257,7 @@ describe('Users Test', () => {
                     )
                 }
             })
+
             expect(response.statusCode).toEqual(200)
             const user = JSON.parse(response.payload)
             expect(user.name).toEqual(updatedName)
@@ -290,9 +295,11 @@ describe('Users Test', () => {
             expect(response.statusCode).toEqual(204)
         })
         it('Deletes a user when requesting User is admin', async () => {
+            const user = await createUserCredentials(server.app.prisma, false)
+
             const response = await server.inject({
                 method: 'DELETE',
-                url: `/users/${userId}`,
+                url: `/users/${user.userId}`,
                 auth: {
                     strategy: API_AUTH_STATEGY,
                     credentials: await createUserCredentials(

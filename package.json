@@ -12,7 +12,9 @@
     "seed": "ts-node ./src/db/seed/",
     "db:reset": "ts-node ./src/db/reset/",
     "db:start": "docker-compose up -d",
-    "prisma:generate": "prisma generate"
+    "db:push": "prisma db push",
+    "prisma:generate": "prisma generate",
+    "build": "prisma generate && tsc"
   },
   "keywords": [],
   "author": "",

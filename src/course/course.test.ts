@@ -44,7 +44,6 @@ describe('Course Test', () => {
                     )
                 }
             })
-            console.log('RESPONSE', response.result)
             expect(response.statusCode).toEqual(201)
             expect(response.result).toHaveProperty('id')
             expect(response.result).toHaveProperty('title', payload.title)

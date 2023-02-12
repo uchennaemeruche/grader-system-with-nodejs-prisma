@@ -1,11 +1,13 @@
 import { Server } from '@hapi/hapi'
 import { API_AUTH_STATEGY } from '../auth/auth.route'
+import { resetDB } from '../db/reset'
 import { AppServer } from '../server/app'
 import { createUserCredentials } from '../test/test.helper'
 
 describe('Users Test', () => {
     let server: Server
     beforeAll(async () => {
+        await resetDB()
         server = await new AppServer(3000, 'localhost').createServer()
     })
 
@@ -113,7 +115,7 @@ describe('Users Test', () => {
                 isAdmin: expect.any(Boolean)
             })
         })
-        it('Returns a single user when the requesting User isAdmin', async () => {
+        it('Returns any single user when the requesting User isAdmin', async () => {
             const credentials = await createUserCredentials(
                 server.app.prisma,
                 true
@@ -126,6 +128,8 @@ describe('Users Test', () => {
                     credentials
                 }
             })
+            console.log(' user ID', userId)
+            console.log('single user', response.result)
             expect(response.statusCode).toEqual(200)
             expect(response.result).toMatchSnapshot({
                 id: expect.any(Number),

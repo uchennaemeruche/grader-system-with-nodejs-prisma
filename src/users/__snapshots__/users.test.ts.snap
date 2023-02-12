@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Users Test Get Users Returns a list of created users 1`] = `
+{
+  "email": Any<String>,
+  "id": Any<Number>,
+  "isAdmin": Any<Boolean>,
+  "name": Any<String>,
+  "social": Any<Object>,
+}
+`;
+
+exports[`Users Test Get Users Returns a single user when the requesting Non-Admin User ID equals the requested user ID 1`] = `
+{
+  "email": Any<String>,
+  "id": Any<Number>,
+  "isAdmin": Any<Boolean>,
+  "name": Any<String>,
+  "social": Any<Object>,
+}
+`;
+
+exports[`Users Test Get Users Returns any single user when the requesting User isAdmin 1`] = `
+{
+  "email": Any<String>,
+  "id": Any<Number>,
+  "isAdmin": Any<Boolean>,
+  "name": Any<String>,
+  "social": Any<Object>,
+}
+`;

@@ -7,6 +7,7 @@ import {
 import { UserRole } from '@prisma/client'
 
 import { API_AUTH_STATEGY } from '../auth/auth.route'
+import { resetDB } from '../db/reset'
 import { AppServer } from '../server/app'
 import { createUserCredentials } from '../test/test.helper'
 import { CourseInput, CourseResponseObject } from './course.service'
@@ -15,8 +16,8 @@ describe('Course Test', () => {
     let server: Server
 
     beforeAll(async () => {
+        await resetDB()
         server = await new AppServer(3000, 'localhost').createServer()
-        server.app.prisma.course.deleteMany({})
     })
 
     afterAll(async () => {
@@ -27,7 +28,8 @@ describe('Course Test', () => {
         it('creates a new course and returns a 201', async () => {
             const payload = {
                 title: 'Test Course',
-                details: 'Introduction to test course'
+                details: 'Introduction to test course',
+                courseCode: 'TSC201'
             }
 
             const response = await server.inject({
@@ -42,6 +44,7 @@ describe('Course Test', () => {
                     )
                 }
             })
+            console.log('RESPONSE', response.result)
             expect(response.statusCode).toEqual(201)
             expect(response.result).toHaveProperty('id')
             expect(response.result).toHaveProperty('title', payload.title)
@@ -58,6 +61,7 @@ describe('Course Test', () => {
             const payload: CourseInput = {
                 title: 'Test Course',
                 details: 'Introduction to test course',
+                courseCode: 'TSC 112',
                 member: {
                     role: UserRole.TEACHER,
                     id: credentials.userId

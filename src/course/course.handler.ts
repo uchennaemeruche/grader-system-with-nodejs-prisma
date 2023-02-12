@@ -1,4 +1,6 @@
+import { forbidden } from '@hapi/boom'
 import { Request, ResponseToolkit } from '@hapi/hapi'
+
 import { CourseInput, CourseService } from './course.service'
 
 export class CourseHandler {
@@ -53,5 +55,17 @@ export class CourseHandler {
         } catch (error: any) {
             return res.response(error.message).code(400)
         }
+    }
+
+    async isTeacherOfCourseOrAdmin(req: Request, res: ResponseToolkit) {
+        const { isAdmin, teacherOf } = req.auth.credentials
+
+        if (isAdmin) return res.continue
+
+        const couseId = parseInt(req.params.courseId)
+
+        if (teacherOf.includes(couseId)) return res.continue
+
+        throw forbidden()
     }
 }

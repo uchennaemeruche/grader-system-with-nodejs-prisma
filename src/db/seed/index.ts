@@ -1,16 +1,8 @@
 import { PrismaClient } from '@prisma/client'
 import { add } from 'date-fns'
+import { resetDB } from '../reset'
 
 const prisma = new PrismaClient()
-
-const resetDB = async () => {
-    await prisma.assessmentResult.deleteMany({})
-    await prisma.courseEnrollment.deleteMany({})
-    await prisma.assessment.deleteMany({})
-    await prisma.token.deleteMany({})
-    await prisma.user.deleteMany({})
-    await prisma.course.deleteMany({})
-}
 
 ;(async () => {
     const weekFromNow = add(new Date(), { weeks: 1 })
@@ -44,6 +36,7 @@ const resetDB = async () => {
         const course = await prisma.course.create({
             data: {
                 title: 'Data Structures and Algorithms',
+                code: 'CSC 103',
                 assessments: {
                     create: [
                         {

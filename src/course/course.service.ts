@@ -3,6 +3,7 @@ import { PrismaClient, UserRole } from '@prisma/client'
 export interface CourseInput {
     title: string
     details: string
+    courseCode: string
     member: {
         role: UserRole
         email?: string
@@ -30,7 +31,7 @@ export class CourseService {
             data: {
                 title: data.title,
                 courseDetails: data.details,
-
+                code: data.courseCode,
                 members: !data.member
                     ? {}
                     : {
@@ -59,17 +60,20 @@ export class CourseService {
             data: {
                 title: data.title,
                 courseDetails: data.details,
-                members: {
-                    create: {
-                        role: data.member.role,
-                        user: {
-                            connect: {
-                                id: data.member.id ?? data.member.id,
-                                email: data.member.email ?? data.member.email
-                            }
-                        }
-                    }
-                }
+                members: !data.member
+                    ? {}
+                    : {
+                          create: {
+                              role: data.member.role,
+                              user: {
+                                  connect: {
+                                      id: data.member.id ?? data.member.id,
+                                      email:
+                                          data.member.email ?? data.member.email
+                                  }
+                              }
+                          }
+                      }
             },
             where: {
                 id: courseId

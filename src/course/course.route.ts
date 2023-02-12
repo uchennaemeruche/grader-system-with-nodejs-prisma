@@ -13,6 +13,10 @@ const CourseInputValidator = Joi.object({
         create: (schema) => schema.required(),
         update: (schema) => schema.optional()
     }),
+    courseCode: Joi.string().alter({
+        create: (schema) => schema.required(),
+        update: (schema) => schema.optional()
+    }),
     member: Joi.object().keys({
         role: Joi.string()
             .valid('STUDENT', 'TEACHER')
@@ -67,6 +71,11 @@ const coursePlugin: Plugin<null> = {
                 handler: (req: Request, res: ResponseToolkit) =>
                     handler.getOne(req, res),
                 options: {
+                    pre: [handler.isTeacherOfCourseOrAdmin],
+                    auth: {
+                        strategy: API_AUTH_STATEGY,
+                        mode: 'required'
+                    },
                     validate: {
                         params: Joi.object().keys({
                             courseId: Joi.number().required()
@@ -80,6 +89,11 @@ const coursePlugin: Plugin<null> = {
                 handler: (req: Request, res: ResponseToolkit) =>
                     handler.update(req, res),
                 options: {
+                    pre: [handler.isTeacherOfCourseOrAdmin],
+                    auth: {
+                        strategy: API_AUTH_STATEGY,
+                        mode: 'required'
+                    },
                     validate: {
                         params: Joi.object().keys({
                             courseId: Joi.number().required()
